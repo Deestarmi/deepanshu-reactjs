@@ -5,7 +5,7 @@
 
 frontend:
   image:
-    repository: YOUR_DOCKERHUB_USERNAME/taskflow-frontend
+    repository: deestar08/taskflow-frontend
     tag: "1.0.0"
     pullPolicy: IfNotPresent
   replicaCount: 1
@@ -22,7 +22,7 @@ frontend:
 
 backend:
   image:
-    repository: YOUR_DOCKERHUB_USERNAME/taskflow-backend
+    repository: deestar08/taskflow-backend
     tag: "1.0.0"
     pullPolicy: IfNotPresent
   replicaCount: 1
