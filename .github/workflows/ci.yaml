@@ -1,0 +1,59 @@
+name: Build & Push Docker Images
+
+# Triggers on every push to main
+on:
+  push:
+    branches: [main]
+
+env:
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out source code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Log in to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 3. Build & push BACKEND image
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/taskflow-backend:latest
+            ${{ env.DOCKERHUB_USERNAME }}/taskflow-backend:${{ github.sha }}
+
+      # 4. Build & push FRONTEND image
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ env.DOCKERHUB_USERNAME }}/taskflow-frontend:latest
+            ${{ env.DOCKERHUB_USERNAME }}/taskflow-frontend:${{ github.sha }}
+
+      # 5. Update Helm values with new image tag (GitOps!)
+      #    This triggers ArgoCD to detect the change and redeploy
+      - name: Update image tags in Helm values
+        run: |
+          SHORT_SHA="${{ github.sha }}"
+          # Update backend tag
+          sed -i "s|tag: \".*\"|tag: \"${SHORT_SHA}\"|g" helm/taskflow/values.yaml
+          # Commit the change back to git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add helm/taskflow/values.yaml
+          git commit -m "ci: update image tags to ${SHORT_SHA}" || echo "No changes to commit"
+          git push

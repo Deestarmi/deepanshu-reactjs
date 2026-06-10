@@ -1,0 +1,28 @@
+# ArgoCD Application — tells ArgoCD WHERE the code lives
+# and WHERE to deploy it (your AKS cluster)
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: taskflow
+  namespace: argocd          # ArgoCD lives in its own namespace
+spec:
+  project: default
+
+  # ── SOURCE: your GitHub repo ──────────────────
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USERNAME/taskflow   # ← change this
+    targetRevision: HEAD
+    path: helm/taskflow       # folder inside your repo
+
+  # ── DESTINATION: your AKS cluster ─────────────
+  destination:
+    server: https://kubernetes.default.svc   # "this cluster"
+    namespace: taskflow
+
+  # ── SYNC POLICY: auto-deploy on git push ──────
+  syncPolicy:
+    automated:
+      prune: true      # delete resources removed from git
+      selfHeal: true   # fix any manual changes (drift)
+    syncOptions:
+      - CreateNamespace=true   # auto-create 'taskflow' namespace
