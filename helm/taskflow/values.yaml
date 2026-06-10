@@ -6,7 +6,7 @@
 frontend:
   image:
     repository: deestar08/taskflow-frontend
-    tag: "c422fbe51dc746c09e430c2f61997dbc0a4c4551"
+    tag: "581758f7f8c411a742bfe0ab18c742e5a4dd5531"
     pullPolicy: IfNotPresent
   replicaCount: 1
   service:
@@ -23,7 +23,7 @@ frontend:
 backend:
   image:
     repository: deestar08/taskflow-backend
-    tag: "c422fbe51dc746c09e430c2f61997dbc0a4c4551"
+    tag: "581758f7f8c411a742bfe0ab18c742e5a4dd5531"
     pullPolicy: IfNotPresent
   replicaCount: 1
   service:
