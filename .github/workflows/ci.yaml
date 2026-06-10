@@ -38,7 +38,7 @@ jobs:
             ${{ secrets.DOCKER_USERNAME }}/taskflow-frontend:latest
             ${{ secrets.DOCKER_USERNAME }}/taskflow-frontend:${{ github.sha }}
 
-      - name: Update image tags in Helm values finally
+      - name: Update image tags in Helm values finally.
         run: |
           SHORT_SHA="${{ github.sha }}"
           sed -i "s|tag: \".*\"|tag: \"${SHORT_SHA}\"|g" helm/taskflow/values.yaml
